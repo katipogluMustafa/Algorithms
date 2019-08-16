@@ -13,24 +13,11 @@ NODE* listFactory(int);
 void printList(NODE* head);
 NODE* findNode(NODE* head, int data);
 int getRandomInt(int rangeMin, int rangeMax);
-
-NODE* findNodeBefore(NODE* head, int target){
-    if( head == NULL )
-        return NULL;
-    else if( head->data == target )
-        return NULL;
-
-    NODE* before = NULL;
-    while(head && head->data != target){
-        before = head;
-        head = head->next;
-    }
-
-    if( head )
-        return before;
-
-    return NULL;
-}
+NODE* findNodeBefore(NODE* head, int target);
+NODE* insertHead(NODE* head, NODE* node);
+NODE* nodeFactory();
+NODE* insertTail(NODE* head, NODE* node);
+void insertAfter(NODE* head, NODE* afterMe, NODE* node);
 
 int main() {
     time_t t;
@@ -53,10 +40,88 @@ int main() {
     else
         printf("Couldn't found it, Sorry...\n");
 
+     printList(head);
+     head = insertHead(head, nodeFactory());
+     printList(head);
+     head = insertTail(head, nodeFactory());
+     printList(head);
+     insertAfter(head, head, nodeFactory());
+     printList(head);
+     insertAfter(head, head->next->next, listFactory(5));
+     printList(head);
+
     return 0;
 }
 
 /* LinkedList Functions */
+
+/*
+ * Inserts after the node afterMe, the node can be another list or single node
+ */
+void insertAfter(NODE* head, NODE* afterMe, NODE* node){
+    if ( !head )
+        return;
+
+    NODE* before = NULL;
+
+    while(head && head != afterMe)
+        head = head->next;
+
+    if( !head )
+        return;
+
+    NODE* ptr = afterMe->next;
+    afterMe->next = node;
+    if( node ) {
+        while ( node->next )
+            node = node->next;
+        node->next = ptr;
+    }
+}
+
+NODE* insertTail(NODE* head, NODE* node){
+    NODE* before = NULL;
+    NODE* ptr = head;
+
+    if( head == NULL )
+        return insertHead(head,node);
+
+    while( ptr ) {
+        before = ptr;
+        ptr = ptr->next;
+    }
+
+    before->next = node;
+    return head;
+}
+
+/**
+ * @return updated head of the list
+ */
+NODE* insertHead(NODE* head, NODE* node){
+    node->next = head;
+    head = node;
+    return head;
+}
+
+
+NODE* findNodeBefore(NODE* head, int target){
+    if( head == NULL )
+        return NULL;
+    else if( head->data == target )
+        return NULL;
+
+    NODE* before = NULL;
+    while(head && head->data != target){
+        before = head;
+        head = head->next;
+    }
+
+    if( head )
+        return before;
+
+    return NULL;
+}
 
 void printList(NODE* head) {
     printf("------ Print List Starts ------\n");
