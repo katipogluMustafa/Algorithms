@@ -18,6 +18,8 @@ NODE* insertHead(NODE* head, NODE* node);
 NODE* nodeFactory();
 NODE* insertTail(NODE* head, NODE* node);
 void insertAfter(NODE* head, NODE* afterMe, NODE* node);
+NODE* deleteNode(NODE* head, int target);
+NODE* destroyList(NODE* head);
 
 int main() {
     time_t t;
@@ -49,11 +51,66 @@ int main() {
      printList(head);
      insertAfter(head, head->next->next, listFactory(5));
      printList(head);
+     head = deleteNode(head, head->data);
+     printList(head);
+     head = deleteNode(head, head->next->next->next->data);
+     printList(head);
+     head = destroyList(head);
+     if( head )
+         printList(head);
+     else
+         printf("List does not exists!");
 
     return 0;
 }
 
 /* LinkedList Functions */
+
+/**
+ *
+ * @return always return NULL, in case in caller forgets the node(argument) still points to the node that has already been freed
+ * returns false head
+ */
+NODE* destroyList(NODE* head){
+    NODE* next;
+    while(head){
+        next = head->next;
+        free(head);
+        head = next;
+    }
+}
+
+/**
+ * @return Deletes node with the given target data, if not found, does nothing
+ */
+NODE* deleteNode(NODE* head, int target){
+    if( !head )
+        return head;
+
+    NODE* ptr = head;
+    NODE* before = NULL;
+
+    if( head->data == target){
+        NODE* temp = head->next;
+        free(head);
+        return temp;        // return new head of the list
+    }
+
+    while(ptr && ptr->data != target){
+        before = ptr;
+        ptr = ptr->next;
+    }
+
+    if( !ptr )
+        return head;        // Target not found, return the list as it is
+
+    // ptr now points to the node that we want to delete
+    before->next = ptr->next;
+    free(ptr);
+
+    return head;            // return updated list
+}
+
 
 /*
  * Inserts after the node afterMe, the node can be another list or single node
@@ -104,7 +161,10 @@ NODE* insertHead(NODE* head, NODE* node){
     return head;
 }
 
-
+/**
+ *
+ * @return Finds the node with the target data and returns node before it
+ */
 NODE* findNodeBefore(NODE* head, int target){
     if( head == NULL )
         return NULL;
